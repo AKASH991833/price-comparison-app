@@ -29,7 +29,7 @@ document.getElementById('btnSample').addEventListener('click',()=>{
       {id:uid(),shop:'Local kirana',date:d(5),price:66,ship:0},{id:uid(),shop:'Blinkit',date:d(5),price:66,ship:25},
       {id:uid(),shop:'DMart',date:d(2),price:64,ship:0}]}
   ]};
-  save();renderAll();toast('Sample tracker loaded');
+  save();renderAll();openCompare(DB.products[0].id);toast('Sample tracker loaded');
 });
 
 /* ---------- render ---------- */

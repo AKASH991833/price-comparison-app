@@ -34,10 +34,13 @@ for(const v of [{name:'desktop',w:1440,h:900},{name:'mobile',w:390,h:844}]){
   // history chart
   const canv=await page.$eval('#chHist',c=>c.width>0);
   check(`${v.name}/${theme} history chart`,canv);
-  // persistence: reload
-  await page.reload({waitUntil:'networkidle2'});await new Promise(s=>setTimeout(s,400));
-  const persisted=await page.$$eval('#productList > .card',els=>els.length);
-  check(`${v.name}/${theme} persists after reload`,persisted===3);
+  // persistence: fresh page without the storage-clearing hook
+  const p2=await browser.newPage();
+  await p2.setViewport({width:v.w,height:v.h,deviceScaleFactor:1});
+  await p2.goto(base,{waitUntil:'networkidle2'});await new Promise(s=>setTimeout(s,400));
+  const persisted=await p2.$$eval('#productList > .card',els=>els.length);
+  check(`${v.name}/${theme} persists after reload`,persisted===3,persisted+' cards');
+  await p2.close();
   await page.screenshot({path:`${out}/compare-${v.name}-${theme}.png`});
   check(`${v.name}/${theme} no console errors`,errs.length===0,errs.slice(0,3).join('|'));
   await page.close();
