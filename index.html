@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Price Comparison - track shops, find the real best deal</title>
+<meta name="description" content="Track prices from different shops, compare effective costs including shipping, watch price history and get target-price deal alerts. Free, offline, no account.">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="brand-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22 2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span><span>Price Comparison</span></a>
+    <nav class="site-nav">
+      <a class="nav-link" href="#products">Products</a>
+      <a class="nav-link" href="#compare">Compare</a>
+      <a class="nav-link" href="#history">History</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" data-theme-toggle aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+      <button class="btn btn-ghost btn-icon menu-btn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="hero wrap rise">
+    <span class="hero-eyebrow">Your data stays on your device</span>
+    <h1>The real best deal, including shipping</h1>
+    <p class="lede">Log the prices you see at different shops, and this tool ranks them by true cost - shipping included, per-unit when you need it - with price history and target-price alerts. No scraping, no account, fully offline.</p>
+    <div class="row row-wrap mt16">
+      <button class="btn btn-primary btn-lg" id="btnSample">Load sample tracker</button>
+      <button class="btn btn-ghost btn-lg" id="btnAdd">Add a product</button>
+    </div>
+  </section>
+
+  <section class="wrap" id="products">
+    <div class="grid grid-3 mb16" id="statsRow"></div>
+    <div class="card mb16 hidden" id="addCard">
+      <div class="card-title" id="addTitle">Add product</div>
+      <div class="grid grid-4">
+        <div class="field"><label class="lbl">Product name</label><input class="input" id="pName" placeholder="e.g. Basmati rice 5kg"></div>
+        <div class="field"><label class="lbl">Target price (optional)</label><input class="input" id="pTarget" type="number" min="0" step="any" placeholder="Alert below this"></div>
+        <div class="field"><label class="lbl">Unit size (optional)</label><input class="input" id="pUnit" type="number" min="0" step="any" placeholder="e.g. 5"></div>
+        <div class="field"><label class="lbl">Unit label</label><input class="input" id="pUnitLabel" placeholder="kg / L / pcs"></div>
+      </div>
+      <div class="row"><div class="grow"></div><button class="btn btn-ghost" id="btnAddCancel">Cancel</button><button class="btn btn-primary" id="btnAddSave">Save product</button></div>
+    </div>
+    <div id="productList" class="stack mb16"></div>
+  </section>
+
+  <section class="wrap hidden" id="compare">
+    <div class="card card-pad-lg mb16">
+      <div class="row row-wrap spread mb16">
+        <div>
+          <div class="card-title" id="cmpTitle">Compare</div>
+          <div class="card-sub mb0" id="cmpSub"></div>
+        </div>
+        <div class="row"><button class="btn btn-ghost btn-sm" id="btnAddPrice">Add price</button><button class="btn btn-ghost btn-sm" id="btnBack">All products</button></div>
+      </div>
+      <div class="grid grid-3 mb16" id="cmpStats"></div>
+      <div class="tbl-wrap mb16" style="border:none"><table class="tbl" id="tblCmp"></table></div>
+      <div id="history">
+        <div class="card-title">Price history</div>
+        <div class="card-sub">Every price you logged for this product</div>
+        <div style="height:260px"><canvas id="chHist"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="row row-wrap spread mb16">
+      <div class="card-title">Backup</div>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" id="btnExport">Export JSON</button>
+        <label class="btn btn-ghost btn-sm" for="impFile">Import JSON</label>
+        <input type="file" id="impFile" accept=".json" hidden>
+        <button class="btn btn-ghost btn-sm" id="btnClear">Clear all data</button>
+      </div>
+    </div>
+    <div class="limit-box"><b>Honest limits:</b> this tool compares the prices <b>you enter</b> - it does not scrape stores (that breaks their terms and breaks often). Data is stored in your browser's localStorage on this device only; export a JSON backup before switching devices or clearing site data.</div>
+  </section>
+</main>
+
+<div class="modal-veil hidden" id="priceModal">
+  <div class="modal">
+    <h3 class="mt0">Add price for <span id="pmProduct"></span></h3>
+    <div class="grid grid-2">
+      <div class="field"><label class="lbl">Shop</label><input class="input" id="prShop" placeholder="e.g. DMart"></div>
+      <div class="field"><label class="lbl">Date</label><input class="input" id="prDate" type="date"></div>
+      <div class="field"><label class="lbl">Price</label><input class="input" id="prPrice" type="number" min="0" step="any" placeholder="0.00"></div>
+      <div class="field"><label class="lbl">Shipping</label><input class="input" id="prShip" type="number" min="0" step="any" placeholder="0"></div>
+    </div>
+    <div class="row mt8"><div class="grow"></div><button class="btn btn-ghost" id="pmCancel">Cancel</button><button class="btn btn-primary" id="pmSave">Save price</button></div>
+  </div>
+</div>
+
+<footer class="site-footer"><div class="wrap row row-wrap spread">
+  <span>Price Comparison · Free forever · Works offline</span>
+  <span>Built by <a href="https://github.com/AKASH991833">Akash Vishwakarma</a></span>
+</div></footer>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
